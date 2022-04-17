@@ -1,0 +1,136 @@
+{%extends "userbase.html"%}
+
+{%block main%}
+<div class="login-contianer">
+    <a href="{{url_for('home')}}"><img src="../static/images/gleaner logo.png" alt="" class="image-"></a>
+    <h6>Sign up with your email</h6>
+    <p class="signing-option">Already have an account with us? <a href="{{url_for('login')}}"><span  style="color: #0d6efd;">Sign in</span></a></p>
+    <form action="{{url_for('subscribe')}}" method="POST">
+        {{subscribe.csrf_token}}
+
+        {{subscribe.firstname.label(id="form-1")}}
+        {{subscribe.firstname}}
+
+        {{subscribe.lastname.label(id="form-2")}}
+        {{subscribe.lastname}}
+
+    
+        {{subscribe.email.label(id="form-3")}}
+        {% include 'flash_messages.html' %}
+        {{subscribe.email}}
+
+        {{subscribe.password.label(id="form-4")}}
+        {{subscribe.password}}
+        <p style="margin: 0;" class="signing-option">I agree to the Terms of Service and Privacy Policy</p>
+        <button type="submit">Subscribe now</button>
+    </form>
+</div>
+{%endblock%}
+
+{%block css%}
+<style>
+    header, footer{
+        display: none;
+    }
+
+    input:focus-visible {
+    outline: 1px solid #0b66ac;
+}
+
+    input {
+    width: 90%;
+    height: 50px;
+    padding: 0px 20px;
+    border: none;
+    margin: 15px 0px;
+    filter: drop-shadow(0px 0px 3px #00000055);
+    border-radius: 3px;
+}
+
+    h6 {
+    padding: 6px 0px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    margin: 0;
+}
+
+    .login-contianer {
+    width: 25vw;
+    height: auto;
+    padding: 20px;
+    background-color: #ffffff;
+    filter: drop-shadow(0px 0px 4px #00000033);
+    border-radius: 5px;
+    margin-top: 7rem;
+}
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+img.image- {
+    width: 15%;
+    margin: auto;
+    display: block;
+}
+
+p.signing-option {
+    font-size: 12px;
+    text-align: center;
+}
+
+button {
+    width: 90%;
+    height: 50px;
+    border: none;
+    background: #2a578e;
+    filter: drop-shadow(1px 1px 3px #00000044);
+    color: #ffffff;
+    margin: 15px;
+}
+
+label#form-1 {
+    top: 150px;
+}
+
+label#form-2 {
+    top: 230px;
+}
+
+label#form-3 {
+    top: 310px;
+}
+
+label#form-4 {
+    top: 390px;
+}
+
+label {
+    display: inline-block;
+    left: 14%;
+    position: absolute;
+    font-size: 13px;
+    color: #212529;
+    z-index: 1;
+}
+
+
+input {
+    width: 90%;
+    height: 50px;
+    padding: 5px 20px;
+    padding-top: 18px;
+    border: none;
+    font-size: 12px;
+    margin: 15px 0px;
+    filter: drop-shadow(0px 0px 3px #00000055);
+    border-radius: 3px;
+    color: #21252988;
+}
+
+</style>
+{%endblock%}

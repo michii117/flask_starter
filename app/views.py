@@ -4,30 +4,165 @@ Jinja2 Documentation:    https://jinja.palletsprojects.com/
 Werkzeug Documentation:  https://werkzeug.palletsprojects.com/
 This file creates your application.
 """
-
+import os
+from app import app, db, login_manager
+from flask_login import login_user, logout_user, current_user, login_required
+from werkzeug.security import check_password_hash
 from app import app
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, flash
+import requests
+import json
 
+
+
+from app.forms import LoginForm
+from app.forms import Search
+from app.forms import MakeSubscription
+from app.models import UserAccount
+
+
+from datetime import datetime
+
+api_key_header = 'Bearer ' + os.path.join(app.config['API_KEY'])
+header = {'Authorization': api_key_header}
+current = 'us'
+today = datetime.today().strftime("%b %d, %Y")
 
 ###
 # Routing for your application.
-###
+###  
+def get_key(val):
+    country = {'Ukraine':'ua', 'United Kingdom':'uk', 'United States':'us', 'Russia':'ru', 'Australia':'au', 'Belgium':'be', 'Brazil':'br', 'Canada':'ca', 'China':'cn', 'Cuba':'cu', 'France':'fr', 'Germany':'de', 'Hong Kong':'hk','India':'in', 'Mexico':'mx', 'Netherlaands':'nl','New Zealand':'nz','Nigeria':'ng', 'Singapore':'sg', 'South Africa':'za', 'South Korea':'kr','Thailand':'th','Turkey':'tr'}
+    for key, value in country.items():
+         if val == value:
+             return key
 
-@app.route('/')
+def search(word, country):
+    req = requests.get('https://newsapi.org/v2/everything?q='+ get_key(current) + " "+ word + '&language=en', headers= header)
+    return req.json()['articles']
+
+
+def searchByCountry():
+    global current
+    req = requests.get('https://newsapi.org/v2/top-headlines?country=' + current, headers= header)
+    return req.json()['articles']
+
+
+@app.route('/', methods=['POST','GET'])
 def home():
-    """Render website's home page."""
-    return render_template('home.html')
+    form =Search()
+    country = {'Ukraine':'ua', 'United Kingdom':'uk', 'United States':'us', 'Russia':'ru', 'Australia':'au', 'Belgium':'be', 'Brazil':'br', 'Canada':'ca', 'China':'cn', 'Cuba':'cu', 'France':'fr', 'Germany':'de', 'Hong Kong':'hk','India':'in', 'Mexico':'mx', 'Netherlaands':'nl','New Zealand':'nz','Nigeria':'ng', 'Singapore':'sg', 'South Africa':'za', 'South Korea':'kr','Thailand':'th','Turkey':'tr'}
 
 
-@app.route('/about/')
-def about():
-    """Render the website's about page."""
-    return render_template('about.html', name="Mary Jane")
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            word = request.form['search']
+            results = search(word,country)
+            return render_template('home.html', articles = results, date= today, form=form, countries=country)
+
+    results = searchByCountry()
+    print(results)
+    return render_template('home.html', articles = results, date= today, form=form, countries= country,active='News')
 
 
+
+
+@app.route('/<searchTerm>', methods=['POST','GET'])
+def term(searchTerm):
+    form =Search()
+    country = {'Ukraine':'ua', 'United Kingdom':'uk', 'United States':'us', 'Russia':'ru', 'Australia':'au', 'Belgium':'be', 'Brazil':'br', 'Canada':'ca', 'China':'cn', 'Cuba':'cu', 'France':'fr', 'Germany':'de', 'Hong Kong':'hk','India':'in', 'Mexico':'mx', 'Netherlaands':'nl','New Zealand':'nz','Nigeria':'ng', 'Singapore':'sg', 'South Africa':'za', 'South Korea':'kr','Thailand':'th','Turkey':'tr'}
+     
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            word = request.form['search']
+            results = search(word,country)
+            return render_template('home.html', articles = results, date= today, form=form, countries=country)
+
+    results = search(searchTerm,country)    
+    return render_template('home.html', articles = results, date=today, form=form, countries=country, active=searchTerm)
+
+
+
+
+
+@app.route('/<count>', methods=['POST','GET'])
+def country(count):
+    global current 
+    current = count
+    country = {'Ukraine':'ua', 'United Kingdom':'uk', 'United States':'us', 'Russia':'ru', 'Australia':'au', 'Belgium':'be', 'Brazil':'br', 'Canada':'ca', 'China':'cn', 'Cuba':'cu', 'France':'fr', 'Germany':'de', 'Hong Kong':'hk','India':'in', 'Mexico':'mx', 'Netherlaands':'nl','New Zealand':'nz','Nigeria':'ng', 'Singapore':'sg', 'South Africa':'za', 'South Korea':'kr','Thailand':'th','Turkey':'tr'}
+    form = Search()
+    
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            word = request.form['search']
+            results = search(word,country)
+            return render_template('home.html', articles = results, date= today, form=form, countries=country)
+    
+    results = searchByCountry()    
+    return render_template('home.html', articles = results, date= today, form=form, countries=country)
+
+
+
+
+
+@app.route('/subscribe', methods = ['POST', 'GET'])
+def subscribe():
+    form = Search()
+    subscribe = MakeSubscription()
+    if request.method =='POST':
+        fname = request.form['firstname']
+        lname = request.form['lastname']
+        email = request.form['email']
+        password = request.form['password']
+        
+        user = UserAccount(fname,lname,email,password)
+        db.session.add(user)
+        db.session.commit()
+        login_user(user)
+        
+        return redirect(url_for('home'))
+        
+            
+
+    return render_template('signup.html', subscribe=subscribe)
+
+
+@app.route('/login', methods= ['GET','POST'])
+def login():
+
+    form = LoginForm()
+
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            email = form.email.data
+            password = form.password.data
+
+            user = UserAccount.query.filter_by(email=email).first()
+
+            if user is not None and check_password_hash(user.password, password):
+                login_user(user)
+                return redirect(url_for("home"))
+
+    return render_template('login.html', form = form)
+
+    
 ###
 # The functions below should be applicable to all Flask apps.
 ###
+
+# user_loader callback. This callback is used to reload the user object from
+# the user ID stored in the session
+@login_manager.user_loader
+def load_user(id):
+    return UserAccount.query.get(int(id))
+
+
+@app.route("/update", methods=['GET','POST'])
+def logout():
+    logout_user()
+    return redirect(url_for("home"))
+
+
 
 # Display Flask WTF errors as Flash messages
 def flash_errors(form):

@@ -1,19 +1,103 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">My App</a>
+
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
   
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <div class="collapse navbar-collapse" id="navbarSupportedContentleft">
       <ul class="navbar-nav mr-auto">
-        <li class="nav-item">
-          <a class="nav-link active" href="{{ url_for('home') }}">Home</a>
+        <li class="nav-item" onclick="showCountryNav()">
+          <a class="nav-link" style="font-weight: 600;">Country <i class='bx bx-chevron-down' ></i></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('about') }}">About</a>
+          <a class="nav-link" href="" style="font-weight: 600;">Advertise with us</a>
         </li>
+
       </ul>
     </div>
+
+    <div id="company-logo-container">
+      <a href="{{ url_for('home') }}" id="campany-logo-link"><img src="../static/images/gleanerwordedlogo.png" alt="The Gleaner Logo" id="company-logo"> </a>
+    </div>
+    
+    
+    <div class="collapse navbar-collapse" id="navbarSupportedContentright">
+      <ul class="navbar-nav mr-auto">
+        {% if current_user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link signedin" href="{{url_for('logout')}}" >Sign out</a>
+            <a class="nav-link signedin" href="">{{current_user.email}}</a>
+          </li>
+          <li class="nav-item">
+            
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('login') }}" style="font-weight: 600;">Sign In</a>
+          </li>
+          <li class="nav-item subscribe" >
+            <a class="nav-link" href="{{ url_for('subscribe') }}" style="font-weight: 600;">Subscribe Now</a>
+          </li>
+        {% endif %}
+        
+        <li class="nav-item">
+          <form action="{{url_for('home')}}" method="post" class="nav-item" id="searchform" onmouseenter="showSearch()" onmouseleave="hideSearch()">
+            {{form.csrf_token}}
+            {{form.search(id="input-search", value="News")}}
+            <button type="submit" id="btn-search"><a class="nav-search" href=""><i class='bx bx-search'></i></a></button>
+          </form>
+        </li>
+        
+
+      </ul>
+    </div>
+
   </div>
+
+  
+  
 </nav>
+
+<nav class="lower-nav-filter">
+ 
+    <div id="navbarSupportedContent-bottom">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link secondary" href="{{ url_for('term',searchTerm='News') }}" id="News">News</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link secondary" href="{{ url_for('term',searchTerm='Sports') }}" id="Sports">Sports</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link secondary" href="{{ url_for('term',searchTerm='Entertainment')}}" id="Entertainment">Entertainment</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link secondary" href="{{ url_for('term',searchTerm='Jobs')}}" id="Jobs"> Jobs</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link secondary" href="{{ url_for('term',searchTerm='StockMarket')}}" id="StockMarket">Stocks</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link secondary" href="{{ url_for('term',searchTerm='Jamaica')}}" id="Jamaica">Local</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link secondary" href="{{ url_for('term',searchTerm='Covid-19')}}" id="Covid-19">Covid-19</a>
+        </li>
+
+      </ul>
+    </div>
+
+</nav>
+
+
+
+<div class="country-news-selector" id="country-news-selector-id" >
+  <ul id="country-options-holder">
+    {%for country in countries.keys()%}
+    <li class="country-nav-item">
+      <a class="country-nav-link" href="{{url_for('country', count=countries[country] )}}"> <img src="../static/images/flags/{{country}}.png" alt="" class="country-nav-item-flag"> {{country}}</a>
+    </li>
+    {%endfor%}
+  </ul>
+</div>

@@ -2,17 +2,190 @@
 
 {% block css %}
 <link rel="stylesheet" href="{{url_for('static', filename='css/styles.css')}}">
+
+<style>
+  .news-item-container {
+    width: 33%;
+    display: inline-block;
+    padding: 20px;
+    vertical-align: top;
+    transition: 1s;
+  }
+
+  img.news-item-image {
+    width: 100%;
+    object-fit: cover;
+    height: 230px;
+    object-position: top;
+  }
+
+  .news-item-body-container {
+    padding: 10px 0px;
+  }
+
+  a.news-item-title-link {
+    color: #34383b;
+    text-decoration: none;
+  } 
+
+  .section-heading-title {
+    font-family: 'Playfair Display', fangsong;
+    padding: 10px 20px;
+    padding-left: 0px;
+    font-weight: 500;
+    font-size: 19px;
+    border-bottom: 3px solid;
+    display: inline-block;
+    margin: 0;
+    margin-left: 20px;
+}
+
+.page-number {
+    position: absolute;
+    top: 40px;
+    right: 55px;
+    font-size: 20px;
+}
+
+
+h1 {
+    font-family: 'Playfair Display', fangsong;
+    font-size: 85px;
+}
+
+
+img.advertisement-image {
+    width: 90%;
+    height: 90%;
+    padding: 7%;
+    filter: drop-shadow(0px 0px 5px #00000033);
+    border-radius: 10px;
+    display: block;
+    margin: 0;
+    object-fit: cover;
+}
+
+.advertisement-graphics {
+  width: 50vw;
+}
+
+.advertisment-copy {
+  width: 50vw;
+  padding: 90px 20px;
+}
+
+
+h1 {
+  font-family: 'Playfair Display', fangsong;
+  font-size: 5.7vw;
+}
+
+p.advertisment-content {
+    width: 77%;
+    padding: 20px 0px;
+    line-height: 33px;
+    color: #393939;
+    font-family: -apple-system,BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "NotoSans", sans-serif;
+    font-size: 16px;
+}
+
+button {
+    background-color: #393939;
+    border-radius: 2px;
+    border: none;
+    padding: 17px;
+    color: white;
+}
+
+section.advertisement {
+    height: auto;
+    justify-content: center;
+    align-content: center;
+    display: flex;
+}
+
+</style>
 {% endblock %}
 
 {% block main %}
-<div class="p-5 mb-4 bg-light rounded-3 border">
-  <div class="container-fluid py-5">
-    <h1 class="display-5 fw-bold">Hello, world!</h1>
-    <p>This is a simple starter template for a Flask Application</p>
+
+  <section class="header-news-slidebar">
+    {%for article in articles[:6]%}
+      <div class="news-item-container header-top-news" id="slider-page-{{articles.index(article)}}">
+        <div class="news-item-image-container header-top-news">
+          <a href="{{article['url']}}" class="news-item-image-link header-top-news">
+            <img class="news-item-image header-top-news" src="{{article['urlToImage']}}" alt="">
+          </a>
+        </div>
+      
+        <div class="news-item-body-container header-top-news">
+             
+          <span class="page-number">{{articles.index(article)+1}}/6</span>
+          <p class="news-item-credentials header-top-news">
+            <span class="news-source-name">{{article['source']['name']}}</span> 
+            <span class="news-authors"> -</span>  
+            <span class="news-date">{{date}}</span>
+          </p>
+
+          <a href="{{article['url']}}" class="news-item-title-link"><h6 class="news-item-heading header-top-news">{{article['title']}}</h6></a>
+          <p class="news-item-description header-top-news">{{article['content']}}</p>
+
+          <div class="pagification-buttons">
+      
+            <span class="circular-pagification cpactive first" id="cp-0" onclick="switchSlider(0)"></span>
+            {%for article in articles[1:6]%}
+              <span class="circular-pagification" id="cp-{{articles.index(article)}}" onclick="switchSlider('{{articles.index(article)}}')"></span>
+            {%endfor%}
+          </div>
+        </div>
+
+      </div>
+
+    {%endfor%}
+    
+    
+  </section>
+
+  <section class="news-stories-section">
+    <h6 class="section-heading-title">Top News Stories</h6>
+    <hr style="height: 1px;margin: -1px 20px 15px 20px;">
+    {%for article in articles[6:17]%}
+    <div class="news-item-container">
+      <div class="news-item-image-container">
+        <a href="{{article['url']}}" class="news-item-image-link"><img class="news-item-image" src="{{article['urlToImage']}}" alt=""></a>
+      </div>
+    
+      <div class="news-item-body-container">
+        <a href="{{article['url']}}" class="news-item-title-link"><h6 class="news-item-heading">{{article['title']}}</h6></a>
+        <p class="news-item-description">{{article['description']}}</p>
+      </div>
+    </div>
+    {%endfor%}
+  </section>
+
+  <div class="ad-container">
+    <img src="../static/images/Ads/ad1.PNG" alt="" class="ad-image">
   </div>
-</div>
+
+  <section class="advertisement">
+    <div class="advertisment-copy">
+      <h1 class="advertisment-heading">Advertise with us and grow your sales</h1>
+      <p class="advertisment-content">Engage over 2.6 billion of our monthly readers and boost your business' visibility. Generate more leads, market your business and grow your sales in one place.</p>
+      <button>Start Advertising</button>
+    </div>
+    <div class="advertisement-graphics">
+      <img src="../static/images/my-networking-apparel-BWz9C3mMHb8-unsplash.jpg" alt="" class="advertisement-image">
+    </div>
+  </section>
+  
 {% endblock %}
 
 {% block js %}
 <script src="{{ url_for('static', filename='js/app.min.js') }}" charset="utf-8"></script>
+<script>
+  $('#{{active}}').toggleClass('active');
+</script>
 {% endblock %}
+
+
+
