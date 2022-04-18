@@ -1,12 +1,12 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="floating">
   <div class="container-fluid">
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
+      <span class="navbar-toggler-icon" id="menuphone" onclick="showNav()"><i class='bx bx-menu-alt-left' ></i></span>
     </button>
   
-    <div class="collapse navbar-collapse" id="navbarSupportedContentleft">
-      <ul class="navbar-nav mr-auto">
+    <div class="" id="navbarSupportedContentleft">
+      <ul class="navbar-nav mr-auto phone top1">
         <li class="nav-item" onclick="showCountryNav()">
           <a class="nav-link" style="font-weight: 600;">Country <i class='bx bx-chevron-down' ></i></a>
         </li>
@@ -22,10 +22,10 @@
     </div>
     
     
-    <div class="collapse navbar-collapse" id="navbarSupportedContentright">
-      <ul class="navbar-nav mr-auto">
+    <div class="" id="navbarSupportedContentright">
+      <ul class="navbar-nav mr-auto phone top3">
         {% if current_user.is_authenticated %}
-          <li class="nav-item">
+          <li class="nav-item  ">
             <a class="nav-link signedin" href="{{url_for('logout')}}" >Sign out</a>
             <a class="nav-link signedin" href="">{{current_user.email}}</a>
           </li>
@@ -36,8 +36,8 @@
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('login') }}" style="font-weight: 600;">Sign In</a>
           </li>
-          <li class="nav-item subscribe" >
-            <a class="nav-link" href="{{ url_for('subscribe') }}" style="font-weight: 600;">Subscribe Now</a>
+          <li class="nav-item subscribe phone top4" >
+            <a class="nav-link" href="{{ url_for('subscribe') }}" style="font-weight: 600;"><span style="color: #ffffff;">Subscribe Now</span></a>
           </li>
         {% endif %}
         
@@ -100,4 +100,9 @@
     </li>
     {%endfor%}
   </ul>
+</div>
+
+
+<div id="phonenav">
+
 </div>

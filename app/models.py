@@ -68,3 +68,29 @@ class Profile(db.Model):
     country = db.Column(db.String)
     outlets = db.Column(db.String)
 
+
+class AdProspects(db.Model):
+    __tablename__='advertisements'
+    id = db.Column(db.Integer, primary_key = True)
+    firstname = db.Column(db.String)
+    lastname = db.Column(db.String)
+    email = db.Column(db.String)
+    number = db.Column(db.String)
+    companyname = db.Column(db.String)
+    jobtitle = db.Column(db.String)
+    adverttitle = db.Column(db.String)
+    advertdescription = db.Column(db.String)
+    advertphoto = db.Column(db.String)
+
+    def __init__(self, firstname, lastname, email, number,companytype, companyname, jobtitle, adverttitle, advertdescription, advertphoto):
+        self.firstname = firstname
+        self.lastname = lastname
+        self.firstname = firstname
+        self.email = email
+        self.number = number
+        self.companytype = companytype
+        self.companyname = companyname
+        self.jobtitle = jobtitle
+        self.adverttitle = adverttitle
+        self.advertdescription = advertdescription
+        self.advertphoto = advertphoto

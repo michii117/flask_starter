@@ -17,6 +17,7 @@
     object-fit: cover;
     height: 230px;
     object-position: top;
+    margin-bottom: 15px;
   }
 
   .news-item-body-container {
@@ -49,36 +50,39 @@
 
 
 h1 {
-    font-family: 'Playfair Display', fangsong;
-    font-size: 85px;
-}
+    font-family: -apple-system,BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "NotoSans", sans-serif !important;
+    font-size: 2.7vw;
+    width: 72%;
+    color: #033f4b;
+} 
 
 
 img.advertisement-image {
     width: 90%;
     height: 90%;
-    padding: 7%;
+    padding: 5%;
     filter: drop-shadow(0px 0px 5px #00000033);
     border-radius: 10px;
     display: block;
     margin: 0;
     object-fit: cover;
+    transition: 1s;
+    object-position: top;
 }
 
 .advertisement-graphics {
   width: 50vw;
+  transition: 1s;
+  display: flex;
+  justify-content: center;
 }
 
 .advertisment-copy {
   width: 50vw;
+    transition: 1s;
   padding: 90px 20px;
 }
 
-
-h1 {
-  font-family: 'Playfair Display', fangsong;
-  font-size: 5.7vw;
-}
 
 p.advertisment-content {
     width: 77%;
@@ -102,8 +106,52 @@ section.advertisement {
     justify-content: center;
     align-content: center;
     display: flex;
+    padding-bottom: 50px;
+    transition: 1s;
 }
 
+form#adform {
+    background-color: #ffffff;
+    filter: drop-shadow(2px 2px 4px #00000044);
+    border-radius: 10px;
+    width: 65%;
+    height: auto;
+    padding: 30px;
+    margin-top: 15%;
+    margin-left: 10%;
+}
+
+fieldset {
+    width: 100%;
+}
+
+.adfield {
+    display: block;
+    width: 100%;
+    height: 45px;
+    filter: drop-shadow(0px 0px 2px #00000066);
+    border: none;
+    border-radius: 3px;
+    margin: 10px 0px;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: 300;
+}
+
+.adfield:focus-visible {
+    outline-style: 1px solid #0b66ac;
+}
+
+
+label {
+    color: #707070;
+    font-weight: 300;
+    font-size: 14px;
+}
+
+textarea#advertdescription {
+    height: 130px;
+}
 </style>
 {% endblock %}
 
@@ -156,6 +204,7 @@ section.advertisement {
       </div>
     
       <div class="news-item-body-container">
+        <hr style="width: 70px; height: 5px; border-color: black;">
         <a href="{{article['url']}}" class="news-item-title-link"><h6 class="news-item-heading">{{article['title']}}</h6></a>
         <p class="news-item-description">{{article['description']}}</p>
       </div>
@@ -169,12 +218,73 @@ section.advertisement {
 
   <section class="advertisement">
     <div class="advertisment-copy">
-      <h1 class="advertisment-heading">Advertise with us and grow your sales</h1>
+      <h1 class="advertisment-heading">Advertise with us and <span style="color: #0b66ac;">grow your sales</span> </h1>
       <p class="advertisment-content">Engage over 2.6 billion of our monthly readers and boost your business' visibility. Generate more leads, market your business and grow your sales in one place.</p>
-      <button>Start Advertising</button>
+      
     </div>
     <div class="advertisement-graphics">
-      <img src="../static/images/my-networking-apparel-BWz9C3mMHb8-unsplash.jpg" alt="" class="advertisement-image">
+      <form action="advert" method="POST" id="adform" enctype="multipart/form-data">
+        {{advert.csrf_token}}
+
+        <fieldset id="adInfo1">
+          <h6 class="adformheader">Personal Information<span class="pagecount">1/3</span></h6>
+          
+          {{advert.firstname.label}}
+          {{advert.firstname(class='adfield')}}
+
+          {{advert.lastname.label}}
+          {{advert.lastname(class='adfield')}}
+
+          {{advert.email.label}}
+          {{advert.email(class='adfield')}}
+
+          {{advert.number.label}}
+          {{advert.number(class='adfield')}}
+
+          <button class="adformbtn" onclick="next(2)">Continue</button>
+        </fieldset>
+        
+
+        <fieldset id="adInfo2" style="display: none;">
+          <h6 class="adformheader">Company Information<span class="pagecount">2/3</span></h6>
+          
+          {{advert.companyname.label}}
+          {{advert.companyname(class='adfield')}}
+
+          {{advert.companytype.label}}
+          {{advert.companytype(class='adfield')}}
+
+          {{advert.jobtitle.label}}
+          {{advert.jobtitle(class='adfield')}}
+
+          <div>
+            <button class="adformbtn" onclick="next(3)" style="width: 49%;">Continue</button>
+            <button class="adformbtn" onclick="next(1)" style="width: 49%;">Back</button>
+          </div>
+          
+
+        </fieldset>
+
+        <fieldset id="adInfo3" style="display: none;">
+          <h6 class="adformheader">Advertisement Information<span class="pagecount">3/3</span></h6>
+          
+          {{advert.adverttitle.label}}
+          {{advert.adverttitle(class='adfield')}}
+  
+          {{advert.advertdescription.label}}
+          {{advert.advertdescription(class='adfield')}}
+  
+          {{advert.advertphoto.label}}
+          {{advert.advertphoto(style='margin: 10px 0px;font-size: 14px;font-weight: 300;display: block;')}}
+
+          <div>
+            <button class="adformbtn" type="submit" style="width: 49%;">Send Advert</button>
+            <button class="adformbtn" onclick="next(2)" style="width: 49%;">Back</button>
+          </div>
+        </fieldset>
+
+        
+      </form>
     </div>
   </section>
   

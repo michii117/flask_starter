@@ -12,12 +12,16 @@ from app import app
 from flask import render_template, request, redirect, url_for, flash
 import requests
 import json
+from werkzeug.utils import secure_filename
 
 
 
 from app.forms import LoginForm
 from app.forms import Search
 from app.forms import MakeSubscription
+from app.forms import Prospects
+
+from app.models import AdProspects
 from app.models import UserAccount
 
 
@@ -48,9 +52,11 @@ def searchByCountry():
     return req.json()['articles']
 
 
+
 @app.route('/', methods=['POST','GET'])
 def home():
-    form =Search()
+    form = Search()
+    advert = Prospects()
     country = {'Ukraine':'ua', 'United Kingdom':'uk', 'United States':'us', 'Russia':'ru', 'Australia':'au', 'Belgium':'be', 'Brazil':'br', 'Canada':'ca', 'China':'cn', 'Cuba':'cu', 'France':'fr', 'Germany':'de', 'Hong Kong':'hk','India':'in', 'Mexico':'mx', 'Netherlaands':'nl','New Zealand':'nz','Nigeria':'ng', 'Singapore':'sg', 'South Africa':'za', 'South Korea':'kr','Thailand':'th','Turkey':'tr'}
 
 
@@ -59,17 +65,18 @@ def home():
             word = request.form['search']
             results = search(word,country)
             return render_template('home.html', articles = results, date= today, form=form, countries=country)
-
+            
     results = searchByCountry()
     print(results)
-    return render_template('home.html', articles = results, date= today, form=form, countries= country,active='News')
+    return render_template('home.html', articles = results, date= today, form=form, advert=advert, countries= country,active='News')
 
 
 
 
 @app.route('/<searchTerm>', methods=['POST','GET'])
 def term(searchTerm):
-    form =Search()
+    form = Search()
+    advert = Prospects()
     country = {'Ukraine':'ua', 'United Kingdom':'uk', 'United States':'us', 'Russia':'ru', 'Australia':'au', 'Belgium':'be', 'Brazil':'br', 'Canada':'ca', 'China':'cn', 'Cuba':'cu', 'France':'fr', 'Germany':'de', 'Hong Kong':'hk','India':'in', 'Mexico':'mx', 'Netherlaands':'nl','New Zealand':'nz','Nigeria':'ng', 'Singapore':'sg', 'South Africa':'za', 'South Korea':'kr','Thailand':'th','Turkey':'tr'}
      
     if request.method == 'POST':
@@ -79,8 +86,31 @@ def term(searchTerm):
             return render_template('home.html', articles = results, date= today, form=form, countries=country)
 
     results = search(searchTerm,country)    
-    return render_template('home.html', articles = results, date=today, form=form, countries=country, active=searchTerm)
+    return render_template('home.html', articles = results, date=today, form=form, advert=advert, countries=country, active=searchTerm)
 
+
+
+@app.route('/advert', methods = ["POST"])
+def advert():
+    firstname = request.form['firstname']
+    lastname = request.form['lastname']
+    email = request.form['email']
+    number = request.form['number']
+    companytype = request.form['companytype']
+    companyname = request.form['companyname']
+    jobtitle = request.form['jobtitle']
+    adverttitle = request.form['adverttitle']
+    advertdescription = request.form['advertdescription']
+    advertphoto = request.files['advertphoto']
+
+    filename = secure_filename(advertphoto.filename)
+    advertphoto.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+    ad = AdProspects(firstname, lastname, email, number, companytype, companyname, jobtitle, adverttitle, advertdescription, filename)
+    db.session.add(ad)
+    db.session.commit()
+
+    return redirect(url_for('home'))
 
 
 
@@ -89,8 +119,11 @@ def term(searchTerm):
 def country(count):
     global current 
     current = count
-    country = {'Ukraine':'ua', 'United Kingdom':'uk', 'United States':'us', 'Russia':'ru', 'Australia':'au', 'Belgium':'be', 'Brazil':'br', 'Canada':'ca', 'China':'cn', 'Cuba':'cu', 'France':'fr', 'Germany':'de', 'Hong Kong':'hk','India':'in', 'Mexico':'mx', 'Netherlaands':'nl','New Zealand':'nz','Nigeria':'ng', 'Singapore':'sg', 'South Africa':'za', 'South Korea':'kr','Thailand':'th','Turkey':'tr'}
     form = Search()
+    advert = Prospects()
+    country = {'Ukraine':'ua', 'United Kingdom':'uk', 'United States':'us', 'Russia':'ru', 'Australia':'au', 'Belgium':'be', 'Brazil':'br', 'Canada':'ca', 'China':'cn', 'Cuba':'cu', 'France':'fr', 'Germany':'de', 'Hong Kong':'hk','India':'in', 'Mexico':'mx', 'Netherlaands':'nl','New Zealand':'nz','Nigeria':'ng', 'Singapore':'sg', 'South Africa':'za', 'South Korea':'kr','Thailand':'th','Turkey':'tr'}
+    
+
     
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -99,7 +132,7 @@ def country(count):
             return render_template('home.html', articles = results, date= today, form=form, countries=country)
     
     results = searchByCountry()    
-    return render_template('home.html', articles = results, date= today, form=form, countries=country)
+    return render_template('home.html', articles = results, date= today, form=form, advert=advert, countries=country)
 
 
 
